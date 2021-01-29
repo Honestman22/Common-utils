@@ -1,0 +1,82 @@
+ 
+ 微信通讯录排序
+ 
+ 中英文混合排序
+ 
+ <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+ 
+ 
+ 
+ public static String getAlphabet(String str) {
+        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+        // 输出拼音全部小写
+        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        // 不带声调
+        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        String pinyin = null;
+        try {
+            pinyin = PinyinHelper.toHanYuPinyinString(str, defaultFormat,"",true).toLowerCase();
+        } catch (BadHanyuPinyinOutputFormatCombination e) {
+            e.printStackTrace();
+        }
+        return pinyin;
+    }
+    public static void main(String[] args) {
+
+        List<ContactVO>  contactVOs=new ArrayList<>();
+        ContactVO contactVO1 = ContactVO.builder().openId("123").nickName("啊").build();
+        ContactVO contactVO2 = ContactVO.builder().openId("124").nickName("cao").build();
+        ContactVO contactVO4 = ContactVO.builder().openId("124").nickName("caoc").build();
+        ContactVO contactVO3 = ContactVO.builder().openId("125").nickName("宝宝").build();
+        ContactVO contactVO5 = ContactVO.builder().openId("125").nickName("，").build();
+        ContactVO contactVO6 = ContactVO.builder().openId("125").nickName("\uD83D\uDCAF").build();
+        ContactVO contactVO7 = ContactVO.builder().openId("126").nickName("").build();
+        ContactVO contactVO8 = ContactVO.builder().openId("126").nickName("").build();
+        contactVOs.add(contactVO1);
+        contactVOs.add(contactVO2);
+        contactVOs.add(contactVO3);
+        contactVOs.add(contactVO4);
+        contactVOs.add(contactVO5);
+        contactVOs.add(contactVO6);
+        contactVOs.add(contactVO7);
+        contactVOs.add(contactVO8);
+        Comparator<ContactVO> comparator = new Comparator<ContactVO>() {
+
+            @Override
+            public int compare(ContactVO o1, ContactVO o2) {
+
+                String alphabet1 = getAlphabet(o1.getNickName());
+
+                if(StringUtils.isEmpty(alphabet1)){
+                    return 1;
+                }
+                String alphabet2 = getAlphabet(o2.getNickName());
+                if(StringUtils.isEmpty(alphabet2)){
+                    return -1;
+                }
+
+                for (int i = 0; i < Math.max(alphabet1.length(), alphabet2.length()); i++) {
+
+                    int compare = CompareUtil.compare(alphabet1.charAt(i), alphabet2.charAt(i));
+                    if (compare != 0) {
+                        return compare;
+                    } else {
+                        if ((i+1) == Math.min(alphabet1.length(), alphabet2.length())) {
+                            return alphabet1.length() - alphabet2.length();
+                        }
+                        continue;
+                    }
+
+                }
+                return 0;
+            }
+
+        };
+        Collections.sort(contactVOs,comparator);
+        System.out.println(contactVOs);
+
+    }
