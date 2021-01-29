@@ -3,6 +3,8 @@
  
  中英文混合排序
  
+ 通讯录排序
+ 
  <dependency>
             <groupId>com.belerweb</groupId>
             <artifactId>pinyin4j</artifactId>
